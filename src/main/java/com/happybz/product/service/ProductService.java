@@ -1,6 +1,7 @@
 package com.happybz.product.service;
 
 import com.happybz.product.dataobject.ProductInfo;
+import com.happybz.product.dto.CartDTO;
 
 import java.util.List;
 
@@ -13,14 +14,14 @@ public interface ProductService {
 
     /**
      * 查询商品列表
-     * @param productIdList
+     * @param
      * @return
      */
-//    List<ProductInfoOutput> findList(List<String> productIdList);
+    List<ProductInfo> findList(List<String> productIdList);
 
     /**
      * 扣库存
-     * @param decreaseStockInputList
+     * @param
      */
-//    void decreaseStock(List<DecreaseStockInput> decreaseStockInputList);
+    void decreaseStock(List<CartDTO> cartDTOList);
 }

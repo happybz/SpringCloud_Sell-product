@@ -3,9 +3,11 @@ package com.happybz.product.service.impl;
 //import com.happybz.product.common.DecreaseStockInput;
 //import com.happybz.product.common.ProductInfoOutput;
 import com.happybz.product.dataobject.ProductInfo;
+import com.happybz.product.dto.CartDTO;
 import com.happybz.product.enums.ProductStatusEnum;
 import com.happybz.product.enums.ResultEnum;
 //import com.happybz.product.exception.ProductException;
+import com.happybz.product.exception.ProductException;
 import com.happybz.product.repository.ProductInfoRepository;
 import com.happybz.product.service.ProductService;
 import com.happybz.product.utils.JsonUtil;
@@ -30,52 +32,30 @@ public class ProductServiceImpl implements ProductService {
         return productInfoRepository.findByProductStatus(ProductStatusEnum.UP.getCode());
     }
 
-//    @Override
-//    public List<ProductInfoOutput> findList(List<String> productIdList) {
-//        return productInfoRepository.findByProductIdIn(productIdList).stream()
-//                .map(e -> {
-//                    ProductInfoOutput output = new ProductInfoOutput();
-//                    BeanUtils.copyProperties(e, output);
-//                    return output;
-//                })
-//                .collect(Collectors.toList());
-//    }
-//
-//    @Override
-//    public void decreaseStock(List<DecreaseStockInput> decreaseStockInputList) {
-//        List<ProductInfo> productInfoList = decreaseStockProcess(decreaseStockInputList);
-//
-//        //发送mq消息
-//        List<ProductInfoOutput> productInfoOutputList = productInfoList.stream().map(e -> {
-//            ProductInfoOutput output = new ProductInfoOutput();
-//            BeanUtils.copyProperties(e, output);
-//            return output;
-//        }).collect(Collectors.toList());
-//        amqpTemplate.convertAndSend("productInfo", JsonUtil.toJson(productInfoOutputList));
-//
-//    }
-//
-//    @Transactional
-//    public List<ProductInfo> decreaseStockProcess(List<DecreaseStockInput> decreaseStockInputList) {
-//        List<ProductInfo> productInfoList = new ArrayList<>();
-//        for (DecreaseStockInput decreaseStockInput: decreaseStockInputList) {
-//            Optional<ProductInfo> productInfoOptional = productInfoRepository.findById(decreaseStockInput.getProductId());
-//            //判断商品是否存在
-//            if (!productInfoOptional.isPresent()){
-//                throw new ProductException(ResultEnum.PRODUCT_NOT_EXIST);
-//            }
-//
-//            ProductInfo productInfo = productInfoOptional.get();
-//            //库存是否足够
-//            Integer result = productInfo.getProductStock() - decreaseStockInput.getProductQuantity();
-//            if (result < 0) {
-//                throw new ProductException(ResultEnum.PRODUCT_STOCK_ERROR);
-//            }
-//
-//            productInfo.setProductStock(result);
-//            productInfoRepository.save(productInfo);
-//            productInfoList.add(productInfo);
-//        }
-//        return productInfoList;
-//    }
+    @Override
+    public List<ProductInfo> findList(List<String> productIdList) {
+        return productInfoRepository.findByProductIdIn(productIdList);
+    }
+
+    @Override
+    @Transactional
+    public void decreaseStock(List<CartDTO> cartDTOList) {
+        for (CartDTO cartDTO : cartDTOList){
+            Optional<ProductInfo> productInfoOptional = productInfoRepository.findById(cartDTO.getProductId());
+            //判断商品是否存在
+            if (!productInfoOptional.isPresent()){
+                throw new ProductException(ResultEnum.PRODUCT_NOT_EXIST);
+            }
+
+            ProductInfo productInfo = productInfoOptional.get();
+            //库存是否足够
+            Integer result = productInfo.getProductStock() - cartDTO.getProductQuantity();
+            if (result < 0){
+                throw new ProductException(ResultEnum.PRODUCT_STOCK_ERROR);
+            }
+
+            productInfo.setProductStock(result);
+            productInfoRepository.save(productInfo);
+        }
+    }
 }

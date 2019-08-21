@@ -5,6 +5,7 @@ import com.happybz.product.VO.ProductVO;
 import com.happybz.product.VO.ResultVO;
 import com.happybz.product.dataobject.ProductCategory;
 import com.happybz.product.dataobject.ProductInfo;
+import com.happybz.product.dto.CartDTO;
 import com.happybz.product.service.CategoryService;
 import com.happybz.product.service.ProductService;
 import com.happybz.product.utils.ResultVOUtil;
@@ -68,5 +69,21 @@ public class ProductController {
         }
 
         return ResultVOUtil.success(productVOList);
+    }
+
+    /**
+     * 获取商品列表(给订单服务用的)
+     *
+     * @param productIdList
+     * @return
+     */
+    @PostMapping("/listForOrder")
+    public List<ProductInfo> listForOrder(@RequestBody List<String> productIdList) {
+        return productService.findList(productIdList);
+    }
+
+    @PostMapping("/decreaseStock")
+    public void decreaseStock(@RequestBody List<CartDTO> cartDTOList) {
+        productService.decreaseStock(cartDTOList);
     }
 }
