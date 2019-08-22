@@ -3,9 +3,10 @@ package com.happybz.product.controller;
 import com.happybz.product.VO.ProductInfoVO;
 import com.happybz.product.VO.ProductVO;
 import com.happybz.product.VO.ResultVO;
+import com.happybz.product.common.DecreaseStockInput;
+import com.happybz.product.common.ProductInfoOutput;
 import com.happybz.product.dataobject.ProductCategory;
 import com.happybz.product.dataobject.ProductInfo;
-import com.happybz.product.dto.CartDTO;
 import com.happybz.product.service.CategoryService;
 import com.happybz.product.service.ProductService;
 import com.happybz.product.utils.ResultVOUtil;
@@ -78,12 +79,12 @@ public class ProductController {
      * @return
      */
     @PostMapping("/listForOrder")
-    public List<ProductInfo> listForOrder(@RequestBody List<String> productIdList) {
+    public List<ProductInfoOutput> listForOrder(@RequestBody List<String> productIdList) {
         return productService.findList(productIdList);
     }
 
     @PostMapping("/decreaseStock")
-    public void decreaseStock(@RequestBody List<CartDTO> cartDTOList) {
-        productService.decreaseStock(cartDTOList);
+    public void decreaseStock(@RequestBody List<DecreaseStockInput> decreaseStockInputList) {
+        productService.decreaseStock(decreaseStockInputList);
     }
 }
